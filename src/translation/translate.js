@@ -44,24 +44,40 @@ global.DOMParser = dom.window.DOMParser;
 global.XMLSerializer = require("w3c-xmlserializer/lib/XMLSerializer").interface;
 
 // Shimming innerText property for JSDOM attributes, see https://github.com/jsdom/jsdom/issues/1245
-var Attr = require('jsdom/lib/jsdom/living/generated/Attr');
-Object.defineProperty(Attr.interface.prototype, 'innerText', {
-	get: function() { return this.textContent },
-	set: function(value) { this.textContent = value },
-	configurable: true,
-});
-var Node = require('jsdom/lib/jsdom/living/generated/Node');
-Object.defineProperty(Node.interface.prototype, 'innerText', {
-	get: function() {
-		// innerText in the browser is more sophisticated, but this removes most unwanted content
-		// https://github.com/jsdom/jsdom/issues/1245#issuecomment-584677454
-		var el = this.cloneNode(true);
-		el.querySelectorAll('script,style').forEach(s => s.remove())
-		return el.textContent
-	},
-	set: function(value) { this.textContent = value },
-	configurable: true,
+// var Attr = require('jsdom/lib/jsdom/living/generated/Attr');
+// Object.defineProperty(Attr.interface.prototype, 'innerText', {
+// 	get: function() { return this.textContent },
+// 	set: function(value) { this.textContent = value },
+// 	configurable: true,
+// });
+// var Node = require('jsdom/lib/jsdom/living/generated/Node');
+// Object.defineProperty(Node.interface.prototype, 'innerText', {
+// 	get: function() {
+// 		// innerText in the browser is more sophisticated, but this removes most unwanted content
+// 		// https://github.com/jsdom/jsdom/issues/1245#issuecomment-584677454
+// 		var el = this.cloneNode(true);
+// 		el.querySelectorAll('script,style').forEach(s => s.remove())
+// 		return el.textContent
+// 	},
+// 	set: function(value) { this.textContent = value },
+// 	configurable: true,
+// });
+
+global.Element = (new JSDOM()).window.Element;
+// 'Implement' innerText in JSDOM: https://github.com/jsdom/jsdom/issues/1245
+Object.defineProperty(global.Element.prototype, 'innerText', {
+  get() {
+    return this.textContent;
+  },
 });
 
-
+// Object.defineProperty(global.Element.prototype, 'innerText', {
+// 	get() {
+// 	  return sanitizeHtml(this.textContent, {
+// 		allowedTags: [], // remove all tags and return text content only
+// 		allowedAttributes: {}, // remove all tags and return text content only
+// 	  });
+// 	},
+// 	configurable: true, // make it so that it doesn't blow chunks on re-running tests with things like --watch
+//   });
 module.exports = Zotero.Translate;

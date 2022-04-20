@@ -31,7 +31,7 @@ const Koa = require('koa');
 const _ = require('koa-route');
 const bodyParser = require('koa-bodyparser');
 const cors = require('./cors');
-
+const {parentPort} = require('worker_threads');
 // Prevent UnhandledPromiseRejection crash in Node 15, though this shouldn't be necessary
 process.on('unhandledRejection', (reason, promise) => {
 	Zotero.debug('Unhandled rejection: ' + (reason.stack || reason), 1)
@@ -58,9 +58,9 @@ Translators.init()
 .then(function () {
 	// Don't start server in test mode, since it's handled by supertest
 	if (process.env.NODE_ENV == 'test') return;
-	
 	var port = config.get('port');
 	var host = config.get('host');
 	app.listen(port, host);
 	Debug.log(`Listening on ${host}:${port}`);
+    parentPort.postMessage({type: 'ready'});
 });
