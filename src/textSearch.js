@@ -23,7 +23,7 @@
     ***** END LICENSE BLOCK *****
 */
 
-const config = require('config');
+const config = require('./config.js');;
 const XRegExp = require('xregexp');
 const md5 = require('md5');
 const AWS = require('aws-sdk');

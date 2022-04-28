@@ -1,6 +1,6 @@
 /* global assert:false, request:false, sinon:false */
 
-const config = require('config');
+const config = require('./config.js');;
 const HTTP = require('../src/http');
 const TextSearch = require('../src/textSearch');
 const path = require('path');

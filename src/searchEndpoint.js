@@ -23,7 +23,7 @@
     ***** END LICENSE BLOCK *****
 */
 
-const config = require('config');
+const config = require('./config.js');;
 const Translate = require('./translation/translate');
 const TextSearch = require('./textSearch');
 

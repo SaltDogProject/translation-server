@@ -24,7 +24,7 @@
 */
 
 const path = require('path');
-const config = require('config');
+const config = require('./config.js');;
 const fs = require('fs');
 
 var Zotero = global.Zotero = module.exports = new function() {

@@ -26,15 +26,14 @@
 */
 
 const process = require('process');
-const config = require('config');
+const config = require('./config.js');
 const Koa = require('koa');
 const _ = require('koa-route');
 const bodyParser = require('koa-bodyparser');
 const cors = require('./cors');
-const {parentPort} = require('worker_threads');
 // Prevent UnhandledPromiseRejection crash in Node 15, though this shouldn't be necessary
 process.on('unhandledRejection', (reason, promise) => {
-	Zotero.debug('Unhandled rejection: ' + (reason.stack || reason), 1)
+    Zotero.debug('Unhandled rejection: ' + (reason.stack || reason), 1);
 });
 
 require('./zotero');
@@ -45,22 +44,37 @@ const WebEndpoint = require('./webEndpoint');
 const ExportEndpoint = require('./exportEndpoint');
 const ImportEndpoint = require('./importEndpoint');
 
-const app = module.exports = new Koa();
+const app = (module.exports = new Koa());
 app.use(cors);
-app.use(bodyParser({ enableTypes: ['text', 'json']}));
+app.use(bodyParser({ enableTypes: ['text', 'json'] }));
 app.use(_.post('/web', WebEndpoint.handle.bind(WebEndpoint)));
 app.use(_.post('/search', SearchEndpoint.handle.bind(SearchEndpoint)));
 app.use(_.post('/export', ExportEndpoint.handle.bind(ExportEndpoint)));
 app.use(_.post('/import', ImportEndpoint.handle.bind(ImportEndpoint)));
 
 Debug.init(process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 1);
-Translators.init()
-.then(function () {
-	// Don't start server in test mode, since it's handled by supertest
-	if (process.env.NODE_ENV == 'test') return;
-	var port = config.get('port');
-	var host = config.get('host');
-	app.listen(port, host);
-	Debug.log(`Listening on ${host}:${port}`);
-    parentPort.postMessage({type: 'ready'});
+global.inited = false;
+console.log('Starting parser server..');
+process.on('message', (msg) => {
+    console.log('Receive message from parent:', msg);
+    if (msg.type === 'init') {
+        for (let i in Object.keys(msg.data)) {
+            const key = Object.keys(msg.data)[i];
+            config.set(key, msg.data[key]);
+        }
+        if (global.inited) {
+            return;
+        }
+
+        global.inited = true;
+        Translators.init().then(function () {
+            // Don't start server in test mode, since it's handled by supertest
+            if (process.env.NODE_ENV == 'test') return;
+            var port = config.get('port');
+            var host = config.get('host');
+            app.listen(port, host);
+            Debug.log(`Listening on ${host}:${port}`);
+            process.send({ type: 'ready' });
+        });
+    }
 });

@@ -1,6 +1,6 @@
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "bodyParser" }] */
 
-const config = require('config');
+const config = require('./config.js');;
 const request = require('supertest');
 const chai = require('chai');
 global.sinon = require('sinon');

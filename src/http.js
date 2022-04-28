@@ -23,7 +23,7 @@
     ***** END LICENSE BLOCK *****
 */
 
-var config = require('config');
+var config = require('./config.js');;
 var request = require('request');
 var iconv = require('iconv-lite');
 var url = require('url');
