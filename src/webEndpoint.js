@@ -101,7 +101,7 @@ var WebEndpoint = module.exports = {
  * Perform garbage collection every 10 requests
  */
 function gc() {
-	if ((++requestsSinceGC) == 10) {
+	if ((++requestsSinceGC) == 4) {
 		for (let i in sessionsWaitingForSelection) {
 			let session = sessionsWaitingForSelection[i];
 			if (session.started && Date.now() >= session.started + SELECT_TIMEOUT * 1000) {
