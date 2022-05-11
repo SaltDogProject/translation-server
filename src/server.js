@@ -56,12 +56,13 @@ Debug.init(process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 1);
 global.inited = false;
 console.log('Starting parser server..');
 process.on('message', (msg) => {
-    console.log('Receive message from parent:', msg);
+    // console.log('Receive message from parent:', msg);
     if (msg.type === 'init') {
         for (let i in Object.keys(msg.data)) {
             const key = Object.keys(msg.data)[i];
             config.set(key, msg.data[key]);
         }
+        global._translators = msg.translators || null;
         if (global.inited) {
             return;
         }
