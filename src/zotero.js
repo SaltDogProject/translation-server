@@ -24,94 +24,97 @@
 */
 
 const path = require('path');
-const config = require('./config.js');;
+const config = require('./config.js');
 const fs = require('fs');
 
-var Zotero = global.Zotero = module.exports = new function() {
-	this.isNode = true;
-	this.isServer = true;
-	this.locale = 'en-US';
-	
-	this.version = "5.0.97";
-	
-	/**
-	 * Debug logging function
-	 *
-	 * Uses prefs e.z.debug.log and e.z.debug.level (restart required)
-	 *
-	 * Defaults to log level 3 if level not provided
-	 */
-	this.debug = function(message, level) {
-		Zotero.Debug.log(message, level);
-	}
-	
-	/**
-	 * Log a JS error to the Mozilla JS error console.
-	 * @param {Exception} err
-	 */
-	this.logError = function(err) {
-		// Firefox uses this
-		Zotero.debug(err);
-	}
-	
-	this.setTimeout = setTimeout;
-}
+var Zotero =
+    (global.Zotero =
+    module.exports =
+        new (function () {
+            this.isNode = true;
+            this.isServer = true;
+            this.locale = 'en-US';
+
+            this.version = '5.0.97';
+
+            /**
+             * Debug logging function
+             *
+             * Uses prefs e.z.debug.log and e.z.debug.level (restart required)
+             *
+             * Defaults to log level 3 if level not provided
+             */
+            this.debug = function (message, level) {
+                Zotero.Debug.log(message, level);
+            };
+
+            /**
+             * Log a JS error to the Mozilla JS error console.
+             * @param {Exception} err
+             */
+            this.logError = function (err) {
+                // Firefox uses this
+                Zotero.debug(err);
+            };
+
+            this.setTimeout = setTimeout;
+        })());
 
 // TODO: Pref store
-Zotero.Prefs = new function(){
-	var tempStore = {};
-	
-	this.get = function(pref) {
-		if (tempStore.hasOwnProperty(pref)) return tempStore[pref];
-		if (config.has(pref)) return config.get(pref);
-	};
+Zotero.Prefs = new (function () {
+    var tempStore = {};
 
-	/**
-	 * @param pref
-	 * @param value
-	 */
-	this.set = function(pref, value) {
-		tempStore[pref] = value;
-	};
+    this.get = function (pref) {
+        if (tempStore.hasOwnProperty(pref)) return tempStore[pref];
+        if (config.has(pref)) return config.get(pref);
+    };
 
-	/**
-	 * @param pref
-	 */
-	this.clear = function(pref) {
-		delete tempStore[pref];
-	}
-}
+    /**
+     * @param pref
+     * @param value
+     */
+    this.set = function (pref, value) {
+        tempStore[pref] = value;
+    };
+
+    /**
+     * @param pref
+     */
+    this.clear = function (pref) {
+        delete tempStore[pref];
+    };
+})();
 
 /**
  * A custom require function to import modules from the translate submodule
  * @param {String} modulePath
  * @returns {*}
  */
-Zotero.requireTranslate = function(modulePath) {
-	return require(path.resolve(__dirname, '../modules/translate/src/', modulePath));
-}
+Zotero.requireTranslate = function (modulePath) {
+    // return require('../modules/translate/src/', modulePath);
+};
 
-Zotero.requireUtilities = function(modulePath) {
-	return require(path.resolve(__dirname, '../modules/utilities/', modulePath));
-}
+Zotero.requireUtilities = function (modulePath) {
+    // return require('../modules/utilities/', modulePath);
+};
 
-Zotero.Promise = Zotero.requireTranslate('./promise');
-Zotero.Debug = Zotero.requireTranslate('./debug');
+Zotero.Promise = require('../modules/translate/src/promise');
+Zotero.Debug = require('../modules/translate/src/debug');
 Zotero.Translators = require('./translators');
-Zotero.Date = Zotero.requireUtilities('./date');
-Zotero.Date.init(Zotero.requireUtilities('./resource/dateFormats.json'))
-Zotero.OpenURL = Zotero.requireUtilities('./openurl');
+Zotero.Date = require('../modules/utilities/date');
+Zotero.Date.init(require('../modules/utilities/resource/dateFormats.json'));
+Zotero.OpenURL = require('../modules/utilities/openurl');
 Zotero.Utilities = require('./utilities');
-Zotero.Translator = Zotero.requireTranslate('./translator');
+Zotero.Translator = require('../modules/translate/src/translator');
 Zotero.Translate = require('./translation/translate');
 Zotero.Proxies = require('./proxy').Proxies;
 Zotero.Proxy = require('./proxy').Proxy;
 
-var $rdf = Zotero.requireTranslate('./rdf/init');
-if(Zotero.RDF) {
-	Zotero.RDF.AJAW = $rdf;
+var $rdf = require('../modules/translate/src/rdf/init');
+if (Zotero.RDF) {
+    Zotero.RDF.AJAW = $rdf;
 } else {
-	Zotero.RDF = {AJAW:$rdf};
+    Zotero.RDF = { AJAW: $rdf };
 }
-Zotero = Object.assign(Zotero, Zotero.requireUtilities('./cachedTypes'));
-Zotero.setTypeSchema(Zotero.requireUtilities('./resource/zoteroTypeSchemaData'));
+Zotero = Object.assign(Zotero, require('../modules/utilities/cachedTypes'));
+Zotero.setTypeSchema(require('../modules/utilities/resource/zoteroTypeSchemaData'));

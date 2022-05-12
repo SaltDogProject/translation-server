@@ -30,7 +30,7 @@ const { info } = require('console');
 const fs = require('fs');
 const path = require('path');
 
-var Translators = Zotero.requireTranslate('./translators');
+var Translators = require('../modules/translate/src/translators');
 
 /**
  * Singleton to handle loading and caching of translators

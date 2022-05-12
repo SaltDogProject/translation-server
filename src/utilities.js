@@ -28,22 +28,22 @@
 
 var Zotero = require('./zotero');
 
-Zotero.OpenURL = Zotero.requireUtilities('./openurl');
-Zotero.Date = Zotero.requireUtilities('./date');
+Zotero.OpenURL = require('../modules/utilities/openurl');
+Zotero.Date = require('../modules/utilities/date');
 
-Zotero.Utilities = Zotero.requireUtilities('./utilities');
-Zotero.Utilities = {...Zotero.Utilities,
-	XRegExp: Zotero.requireUtilities('xregexp-all'),
-	Item: Zotero.requireUtilities('./utilities_item')
+Zotero.Utilities = require('../modules/utilities/utilities');
+Zotero.Utilities = {
+    ...Zotero.Utilities,
+    XRegExp: require('../modules/utilities/xregexp-all'),
+    Item: require('../modules/utilities/utilities_item'),
 };
 // Due to how Utilities.Translate is constructed from the of
 // Utilities, we cannot define it above in the object with the rest
-Zotero.Utilities.Translate = Zotero.requireTranslate('./utilities_translate');
-var addZoteroUnicodeData = Zotero.requireUtilities('xregexp-unicode-zotero');
+Zotero.Utilities.Translate = require('../modules/translate/src/utilities_translate');
+var addZoteroUnicodeData = require('../modules/utilities/xregexp-unicode-zotero');
 addZoteroUnicodeData(Zotero.Utilities.XRegExp);
 
-Zotero.Schema = Zotero.requireUtilities('./schema.js');
+Zotero.Schema = require('../modules/utilities/schema.js');
 Zotero.Schema.init(require('../modules/zotero-schema/schema.json'));
 
 module.exports = Zotero.Utilities;
-

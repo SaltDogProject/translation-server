@@ -23,16 +23,13 @@
 	***** END LICENSE BLOCK *****
 */
 
-Zotero.Translate = Zotero.requireTranslate('./translation/translate');
+Zotero.Translate = require('../../modules/translate/src/translation/translate');
 
-Zotero.Translate = {...Zotero.Translate,
-	SandboxManager: require('./sandboxManager'),
-	...require('./translate_item')
-};
+Zotero.Translate = { ...Zotero.Translate, SandboxManager: require('./sandboxManager'), ...require('./translate_item') };
 Zotero.Translate.ItemSaver.prototype.saveItems = async function (jsonItems, attachmentCallback, itemsDoneCallback) {
-	this.items = (this.items || []).concat(jsonItems)
-	return jsonItems
-}
+    this.items = (this.items || []).concat(jsonItems);
+    return jsonItems;
+};
 
 // Translation architecture shims and monkey-patches
 var wgxpath = require('wicked-good-xpath');
@@ -41,7 +38,7 @@ var { JSDOM } = require('jsdom');
 var dom = new JSDOM('<html></html>');
 wgxpath.install(dom.window, true);
 global.DOMParser = dom.window.DOMParser;
-global.XMLSerializer = require("w3c-xmlserializer/lib/XMLSerializer").interface;
+global.XMLSerializer = require('w3c-xmlserializer/lib/XMLSerializer').interface;
 
 // Shimming innerText property for JSDOM attributes, see https://github.com/jsdom/jsdom/issues/1245
 // var Attr = require('jsdom/lib/jsdom/living/generated/Attr');
@@ -63,12 +60,12 @@ global.XMLSerializer = require("w3c-xmlserializer/lib/XMLSerializer").interface;
 // 	configurable: true,
 // });
 
-global.Element = (new JSDOM()).window.Element;
+global.Element = new JSDOM().window.Element;
 // 'Implement' innerText in JSDOM: https://github.com/jsdom/jsdom/issues/1245
 Object.defineProperty(global.Element.prototype, 'innerText', {
-  get() {
-    return this.textContent;
-  },
+    get() {
+        return this.textContent;
+    },
 });
 
 // Object.defineProperty(global.Element.prototype, 'innerText', {
