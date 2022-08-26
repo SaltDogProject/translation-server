@@ -55,27 +55,30 @@ app.use(_.post('/import', ImportEndpoint.handle.bind(ImportEndpoint)));
 Debug.init(process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 1);
 global.inited = false;
 console.log('Starting parser server..');
-process.on('message', (msg) => {
-    // console.log('Receive message from parent:', msg);
-    if (msg.type === 'init') {
-        for (let i in Object.keys(msg.data)) {
-            const key = Object.keys(msg.data)[i];
-            config.set(key, msg.data[key]);
-        }
-        global._translators = msg.translators || null;
-        if (global.inited) {
-            return;
-        }
 
-        global.inited = true;
-        Translators.init().then(function () {
-            // Don't start server in test mode, since it's handled by supertest
-            if (process.env.NODE_ENV == 'test') return;
-            var port = config.get('port');
-            var host = config.get('host');
-            app.listen(port, host);
-            Debug.log(`Listening on ${host}:${port}`);
-            process.send({ type: 'ready' });
-        });
-    }
+// process.on('message', (msg) => {
+//     // console.log('Receive message from parent:', msg);
+//     if (msg.type === 'init') {
+const data = JSON.parse(process.env.data);
+const translators = JSON.parse(process.env.translators);
+for (let i in Object.keys(data)) {
+    const key = Object.keys(data)[i];
+    config.set(key, data[key]);
+}
+global._translators = translators || null;
+if (global.inited) {
+    return;
+}
+
+global.inited = true;
+Translators.init().then(function () {
+    // Don't start server in test mode, since it's handled by supertest
+    if (process.env.NODE_ENV == 'test') return;
+    var port = config.get('port');
+    var host = config.get('host');
+    app.listen(port, host);
+    Debug.log(`Listening on ${host}:${port}`);
+    process.send({ type: 'ready' });
 });
+//     }
+// });
