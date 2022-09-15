@@ -34,7 +34,7 @@ Zotero.Translate.ItemSaver.prototype.saveItems = async function (jsonItems, atta
 // Translation architecture shims and monkey-patches
 var wgxpath = require('wicked-good-xpath');
 global.XPathResult = wgxpath.XPathResultType;
-var { JSDOM } = require('jsdom');
+var { JSDOM } = require('../../modules/jsdom');
 var dom = new JSDOM('<html></html>');
 wgxpath.install(dom.window, true);
 global.DOMParser = dom.window.DOMParser;
